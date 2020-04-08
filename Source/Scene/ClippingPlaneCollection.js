@@ -6,7 +6,6 @@ import Check from '../Core/Check.js';
 import Color from '../Core/Color.js';
 import defaultValue from '../Core/defaultValue.js';
 import defined from '../Core/defined.js';
-import defineProperties from '../Core/defineProperties.js';
 import destroyObject from '../Core/destroyObject.js';
 import DeveloperError from '../Core/DeveloperError.js';
 import Event from '../Core/Event.js';
@@ -18,9 +17,6 @@ import ContextLimits from '../Renderer/ContextLimits.js';
 import PixelDatatype from '../Renderer/PixelDatatype.js';
 import Sampler from '../Renderer/Sampler.js';
 import Texture from '../Renderer/Texture.js';
-import TextureMagnificationFilter from '../Renderer/TextureMagnificationFilter.js';
-import TextureMinificationFilter from '../Renderer/TextureMinificationFilter.js';
-import TextureWrap from '../Renderer/TextureWrap.js';
 import ClippingPlane from './ClippingPlane.js';
 
     /**
@@ -45,8 +41,8 @@ import ClippingPlane from './ClippingPlane.js';
      * @param {Color} [options.edgeColor=Color.WHITE] The color applied to highlight the edge along which an object is clipped.
      * @param {Number} [options.edgeWidth=0.0] The width, in pixels, of the highlight applied to the edge along which an object is clipped.
      *
-     * @demo {@link https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/?src=3D%20Tiles%20Clipping%20Planes.html|Clipping 3D Tiles and glTF models.}
-     * @demo {@link https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/?src=Terrain%20Clipping%20Planes.html|Clipping the Globe.}
+     * @demo {@link https://sandcastle.cesium.com/?src=3D%20Tiles%20Clipping%20Planes.html|Clipping 3D Tiles and glTF models.}
+     * @demo {@link https://sandcastle.cesium.com/?src=Terrain%20Clipping%20Planes.html|Clipping the Globe.}
      *
      * @example
      * // This clipping plane's distance is positive, which means its normal
@@ -153,7 +149,7 @@ import ClippingPlane from './ClippingPlane.js';
         return (value === Intersect.INSIDE);
     }
 
-    defineProperties(ClippingPlaneCollection.prototype, {
+    Object.defineProperties(ClippingPlaneCollection.prototype, {
         /**
          * Returns the number of planes in this collection.  This is commonly used with
          * {@link ClippingPlaneCollection#get} to iterate over all the planes
@@ -491,13 +487,6 @@ import ClippingPlane from './ClippingPlane.js';
             // Allocate in the Y direction, since texture may be as wide as context texture support.
             requiredResolution.y *= 2;
 
-            var sampler = new Sampler({
-                wrapS : TextureWrap.CLAMP_TO_EDGE,
-                wrapT : TextureWrap.CLAMP_TO_EDGE,
-                minificationFilter : TextureMinificationFilter.NEAREST,
-                magnificationFilter : TextureMagnificationFilter.NEAREST
-            });
-
             if (useFloatTexture) {
                 clippingPlanesTexture = new Texture({
                     context : context,
@@ -505,7 +494,7 @@ import ClippingPlane from './ClippingPlane.js';
                     height : requiredResolution.y,
                     pixelFormat : PixelFormat.RGBA,
                     pixelDatatype : PixelDatatype.FLOAT,
-                    sampler : sampler,
+                    sampler : Sampler.NEAREST,
                     flipY : false
                 });
                 this._float32View = new Float32Array(requiredResolution.x * requiredResolution.y * 4);
@@ -516,7 +505,7 @@ import ClippingPlane from './ClippingPlane.js';
                     height : requiredResolution.y,
                     pixelFormat : PixelFormat.RGBA,
                     pixelDatatype : PixelDatatype.UNSIGNED_BYTE,
-                    sampler : sampler,
+                    sampler : Sampler.NEAREST,
                     flipY : false
                 });
                 this._uint8View = new Uint8Array(requiredResolution.x * requiredResolution.y * 4);
